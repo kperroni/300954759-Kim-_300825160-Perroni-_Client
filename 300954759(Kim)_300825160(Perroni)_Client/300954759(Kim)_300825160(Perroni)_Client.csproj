@@ -6,4 +6,8 @@
     <RootNamespace>_300954759_Kim__300825160_Perroni__Client</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+  </ItemGroup>
+
 </Project>
