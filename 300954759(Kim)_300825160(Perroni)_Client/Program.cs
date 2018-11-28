@@ -16,7 +16,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             // TODO:
             // Routine to get input from user to execute a HTTP request.
             // Create a menu and control it by using a loop structure
-            RunAsync(11).GetAwaiter().GetResult();
+            RunAsync(23).GetAwaiter().GetResult();
             Console.ReadKey();
         }
 
@@ -88,6 +88,69 @@ namespace _300954759_Kim__300825160_Perroni__Client
                 case 11:
                     {
                         await createAGenre();
+                        break;
+                    }
+                // 12 - 14 Users' Operations
+                case 12:
+                    {
+                        await getAllUsers();
+                        break;
+                    }
+                case 13:
+                    {
+                        await getAnUser();
+                        break;
+                    }
+                case 14:
+                    {
+                        await createAnUser();
+                        break;
+                    }
+                // 15 - 19 Shelves' Operations
+                case 15:
+                    {
+                        await getAllShelves();
+                        break;
+                    }
+                case 16:
+                    {
+                        await getAShelf();
+                        break;
+                    }
+                case 17:
+                    {
+                        await createAShelf();
+                        break;
+                    }
+                case 18:
+                    {
+                        await deleteAShelf();
+                        break;
+                    }
+                case 19:
+                    {
+                        await updateAShelf();
+                        break;
+                    }
+                // 20 - 22 BookShelves' Operations
+                case 20:
+                    {
+                        await getAllBookShelves();
+                        break;
+                    }
+                case 21:
+                    {
+                        await getABookShelf();
+                        break;
+                    }
+                case 22:
+                    {
+                        await createABookShelf();
+                        break;
+                    }
+                case 23:
+                    {
+                        await deleteABookShelf();
                         break;
                     }
             }
@@ -358,5 +421,280 @@ namespace _300954759_Kim__300825160_Perroni__Client
             }
         }
         //***************End of Genres methods*******************//
+
+        //***************Users methods*******************//
+        static async Task getAllUsers()
+        {
+            try
+            {
+                string json;
+                HttpResponseMessage response;
+                response = await client.GetAsync("/api/Users");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    json = await response.Content.ReadAsStringAsync();
+                    IEnumerable<User> users =
+                        JsonConvert.DeserializeObject<IEnumerable<User>>(json);
+
+                    foreach (User u in users)
+                    {
+                        // Print user's full name
+                        Console.WriteLine("Users' Name: ");
+                        Console.WriteLine(u.FirstName + " " + u.LastName);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Internal Server Error");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        static async Task getAnUser()
+        {
+            try
+            {
+                // Hardcoded value id = 1 == Heeyeong Kim
+                int id = 1;
+                HttpResponseMessage response = await client.GetAsync("/api/Users/" + id);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    User user = await response.Content.ReadAsAsync<User>();
+                    Console.WriteLine("Retrieved user's name: " + user.FirstName + " " + user.LastName);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Intersal server error");
+            }
+        }
+
+        static async Task createAnUser()
+        {
+            try
+            {
+                User user = new User
+                {
+                    FirstName = "Chris",
+                    LastName = "Jang",
+                    Address = "1234 Bloor Street"
+                };
+
+                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Users", user);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Internal server error");
+            }
+        }
+        //***************End of Users methods*******************//
+
+        //***************Shelf methods*******************//
+        static async Task getAllShelves()
+        {
+            try
+            {
+                string json;
+                HttpResponseMessage response;
+                response = await client.GetAsync("/api/Shelves");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    json = await response.Content.ReadAsStringAsync();
+                    IEnumerable<Shelf> shelves =
+                        JsonConvert.DeserializeObject<IEnumerable<Shelf>>(json);
+
+                    foreach (Shelf s in shelves)
+                    {
+                        // Print shelf's name only
+                        Console.WriteLine("Shelves' Name: ");
+                        Console.WriteLine(s.Name);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Internal Server Error");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        static async Task getAShelf()
+        {
+            try
+            {
+                // Hardcoded value id = 3 == Coding Books
+                int id = 3;
+                HttpResponseMessage response = await client.GetAsync("/api/Shelves/" + id);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Shelf shelf = await response.Content.ReadAsAsync<Shelf>();
+                    Console.WriteLine("The shelf retrieved is: " + shelf.Name);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Intersal server error");
+            }
+        }
+
+        static async Task createAShelf()
+        {
+            try
+            {
+                // Hardcoded shelf object
+                Shelf shelf = new Shelf
+                {
+                    Name = "Romance",
+                    UserId = 2
+                };
+
+                Console.WriteLine(shelf.Name);
+                string postBody = JsonConvert.SerializeObject(shelf);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Shelves", shelf);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Internal server error");
+            }
+        }
+
+        static async Task deleteAShelf()
+        {
+            try
+            {
+                // Hardcoded value id = 6 (May change since it is deleted from db)
+                HttpResponseMessage response = await client.DeleteAsync("/api/Shelves/" + 6);
+                Console.WriteLine($"status from DELETE {response.StatusCode}");
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Internal server error");
+            }
+
+        }
+
+        static async Task updateAShelf()
+        {
+            try
+            {
+                Shelf shelf = new Shelf
+                {
+                    Id = 6,
+                    Name = "Novel"
+                };
+
+                // Hardcoded value id = 6 == Comic
+                HttpResponseMessage response = await client.PutAsJsonAsync("/api/Shelves/6", shelf);
+                Console.WriteLine($"status from PUT {response.StatusCode}");
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Internal server error");
+            }
+        }
+        //***************End of Shelf methods*******************//
+
+        //***************BookShelf methods*******************//
+        static async Task getAllBookShelves()
+        {
+            try
+            {
+                string json;
+                HttpResponseMessage response;
+                response = await client.GetAsync("/api/BookShelves");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    json = await response.Content.ReadAsStringAsync();
+                    IEnumerable<Bookshelf> bookshelves =
+                        JsonConvert.DeserializeObject<IEnumerable<Bookshelf>>(json);
+
+                    foreach (Bookshelf bs in bookshelves)
+                    {
+                        // Print book id and shelf id
+                        Console.WriteLine("ShelfId: " + bs.ShelfId + " BookId: " + bs.BookId);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Internal Server Error");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        static async Task getABookShelf()
+        {
+            try
+            {
+                // Hardcoded value id = 12 == ShelfId:3/BookId:50
+                int id = 12;
+                HttpResponseMessage response = await client.GetAsync("/api/BookShelves/" + id);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Bookshelf bookshelf = await response.Content.ReadAsAsync<Bookshelf>();
+                    Console.WriteLine("Retrieved bookshelf's ShelfId: " + bookshelf.ShelfId + " BookId: " + bookshelf.BookId);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Intersal server error");
+            }
+        }
+
+        static async Task createABookShelf()
+        {
+            try
+            {
+                // Hardcoded shelf object
+                Bookshelf bookshelf = new Bookshelf
+                {
+                    ShelfId=4,
+                    BookId=53
+                };
+
+                string postBody = JsonConvert.SerializeObject(bookshelf);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/api/BookShelves", bookshelf);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Internal server error");
+            }
+        }
+
+        static async Task deleteABookShelf()
+        {
+            try
+            {
+                // Hardcoded value id = 12 (May change since it is deleted from db)
+                HttpResponseMessage response = await client.DeleteAsync("/api/BookShelves/" + 13);
+                Console.WriteLine($"status from DELETE {response.StatusCode}");
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Internal server error");
+            }
+
+        }
+        //***************End of BookShelf methods*******************//
+
     }
 }
