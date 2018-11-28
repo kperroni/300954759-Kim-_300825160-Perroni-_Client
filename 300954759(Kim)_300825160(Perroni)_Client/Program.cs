@@ -16,7 +16,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             // TODO:
             // Routine to get input from user to execute a HTTP request.
             // Create a menu and control it by using a loop structure
-            RunAsync(23).GetAwaiter().GetResult();
+            RunAsync(11).GetAwaiter().GetResult();
             Console.ReadKey();
         }
 
@@ -25,10 +25,29 @@ namespace _300954759_Kim__300825160_Perroni__Client
             client.BaseAddress = new Uri("http://localhost:63885");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
             // This line should add the apikey to the request
             // client.DefaultRequestHeaders.Add("x-apikey", "//apikey value");
 
+            int opt = 0;
+            while(opt != -1)
+            {
+                Console.WriteLine("***Enter selection to run API operations***");
+                Console.WriteLine("---***Books operations:***---\n " +
+                    "1 - Get all \n 2 - Get a Book \n 3 - Create a Book \n 4 - Delete a Book \n 5 - Update a Book\n " +
+                    "---***Authors operations:***---\n " +
+                    "6 - Get all \n 7 - Get an Author \n 8 - Create an Author\n " +
+                    "---***Genres operations***---\n " +
+                    "9 - Get all \n 10 - Get a Genre \n 11 - Create a Genre\n\n" +
+                    "*****Enter -1 to exit******\n" +
+                    "===========================");
+                opt = int.Parse(Console.ReadLine());
+                Console.WriteLine("Loading....");
+                RunAsync(opt).GetAwaiter().GetResult();
+            }
+        }
+
+        static async Task RunAsync(int opt)
+        {
             // Based on the option provided by input, execute a particular HTTP request
             switch (opt)
             {
