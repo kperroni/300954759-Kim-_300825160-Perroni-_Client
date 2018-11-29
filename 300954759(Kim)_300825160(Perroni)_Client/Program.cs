@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -13,23 +15,15 @@ namespace _300954759_Kim__300825160_Perroni__Client
         static HttpClient client = new HttpClient();
         static void Main(string[] args)
         {
-            // TODO:
-            // Routine to get input from user to execute a HTTP request.
-            // Create a menu and control it by using a loop structure
-            RunAsync(11).GetAwaiter().GetResult();
-            Console.ReadKey();
-        }
-
-        static async Task RunAsync(int opt)
-        {
-            client.BaseAddress = new Uri("http://localhost:63885");
+            client.BaseAddress = new Uri("https://kperron1-eval-test.apigee.net");
             client.DefaultRequestHeaders.Accept.Clear();
+            
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            // This line should add the apikey to the request
-            // client.DefaultRequestHeaders.Add("x-apikey", "//apikey value");
+            client.DefaultRequestHeaders.Add("x-apikey", "DysSQG1tKFBGIKuLttkniQnRsdHMB1yp");
+            client.DefaultRequestHeaders.Add("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6,ru;q=0.4");
 
             int opt = 0;
-            while(opt != -1)
+            while (opt != -1)
             {
                 Console.WriteLine("***Enter selection to run API operations***");
                 Console.WriteLine("---***Books operations:***---\n " +
@@ -37,7 +31,13 @@ namespace _300954759_Kim__300825160_Perroni__Client
                     "---***Authors operations:***---\n " +
                     "6 - Get all \n 7 - Get an Author \n 8 - Create an Author\n " +
                     "---***Genres operations***---\n " +
-                    "9 - Get all \n 10 - Get a Genre \n 11 - Create a Genre\n\n" +
+                    "9 - Get all \n 10 - Get a Genre \n 11 - Create a Genre\n" +
+                    "---***Users operations***---\n " +
+                    "12 - Get all \n 13 - Get a User \n 14 - Create a User\n" +
+                    "---***Shelves operations***---\n " +
+                    "15 - Get all \n 16 - Get a Shelf \n 17 - Create a Shelf \n 18 - Delete a Shelf \n 19 - Update a Shelf\n" +
+                    "---***Bookshelves operations***---\n " +
+                    "20 - Get all \n 21 - Get a Book from a Shelf \n 22 - Add a Book to a Shelf \n 23 - Delete a Book from a Shelf\n" +
                     "*****Enter -1 to exit******\n" +
                     "===========================");
                 opt = int.Parse(Console.ReadLine());
@@ -182,7 +182,8 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 string json;
                 HttpResponseMessage response;
-                response = await client.GetAsync("/api/Books");
+                response = await client.GetAsync("/group-project-proxy/api/Books");
+                response.EnsureSuccessStatusCode();
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -213,7 +214,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 // Hardcoded value id = 52 == Bag of Bones
                 int id = 52;
-                HttpResponseMessage response = await client.GetAsync("/api/Books/" + id);
+                HttpResponseMessage response = await client.GetAsync("/group-project-proxy/api/Books/" + id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -246,7 +247,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
 
                 Console.WriteLine(book.Title);
                 string postBody = JsonConvert.SerializeObject(book);
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Books", book);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/group-project-proxy/api/Books", book);
             }
             catch (Exception e)
             {
@@ -259,7 +260,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             try
             {
                 // Hardcoded value id = 54 (May change since it is deleted from db)
-                HttpResponseMessage response = await client.DeleteAsync("/api/Books/" + 54);
+                HttpResponseMessage response = await client.DeleteAsync("/group-project-proxy/api/Books/" + 54);
                 Console.WriteLine($"status from DELETE {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
             }
@@ -286,7 +287,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                 };
 
                 // Hardcoded value id = 60 == Return of the King
-                HttpResponseMessage response = await client.PutAsJsonAsync("/api/Books/60", book);
+                HttpResponseMessage response = await client.PutAsJsonAsync("/group-project-proxy/api/Books/60", book);
                 Console.WriteLine($"status from PUT {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
             }
@@ -304,7 +305,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 string json;
                 HttpResponseMessage response;
-                response = await client.GetAsync("/api/Authors");
+                response = await client.GetAsync("/group-project-proxy/api/Authors");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -315,7 +316,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                     foreach (Author c in authors)
                     {
                         // Printing author's first name only
-                        Console.WriteLine(c.FirstName);
+                        Console.WriteLine(c.FirstName + " "+ c.LastName);
                     }
                 }
                 else
@@ -335,12 +336,12 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 // Hardcoded value id = 13 == J.R.R Tolkien
                 int id = 13;
-                HttpResponseMessage response = await client.GetAsync("/api/Authors/" + id);
+                HttpResponseMessage response = await client.GetAsync("/group-project-proxy/api/Authors/" + id);
 
                 if (response.IsSuccessStatusCode)
                 {
                     Author author = await response.Content.ReadAsAsync<Author>();
-                    Console.WriteLine("The author retrieved is: " + author.FirstName);
+                    Console.WriteLine("The author retrieved is: " + author.FirstName + " "+ author.LastName);
                 }
             }
             catch (Exception e)
@@ -360,7 +361,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                     AreaOfInterest = "War"
                 };
 
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Authors", author);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/group-project-proxy/api/Authors", author);
             }
             catch (Exception e)
             {
@@ -376,7 +377,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 string json;
                 HttpResponseMessage response;
-                response = await client.GetAsync("/api/Genres");
+                response = await client.GetAsync("/group-project-proxy/api/Genres");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -407,7 +408,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 // Hardcoded value id = 16 == Thriller
                 int id = 16;
-                HttpResponseMessage response = await client.GetAsync("/api/Genres/" + id);
+                HttpResponseMessage response = await client.GetAsync("/group-project-proxy/api/Genres/" + id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -432,7 +433,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                     + "in the past about the most famous masterminds and biggest crime jobs executed"
                 };
 
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Genres", genre);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/group-project-proxy/api/Genres", genre);
             }
             catch (Exception e)
             {
@@ -448,7 +449,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 string json;
                 HttpResponseMessage response;
-                response = await client.GetAsync("/api/Users");
+                response = await client.GetAsync("/group-project-proxy/api/Users");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -480,7 +481,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 // Hardcoded value id = 1 == Heeyeong Kim
                 int id = 1;
-                HttpResponseMessage response = await client.GetAsync("/api/Users/" + id);
+                HttpResponseMessage response = await client.GetAsync("/group-project-proxy/api/Users/" + id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -505,7 +506,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                     Address = "1234 Bloor Street"
                 };
 
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Users", user);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/group-project-proxy/api/Users", user);
             }
             catch (Exception e)
             {
@@ -521,7 +522,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 string json;
                 HttpResponseMessage response;
-                response = await client.GetAsync("/api/Shelves");
+                response = await client.GetAsync("/group-project-proxy/api/Shelves");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -553,7 +554,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 // Hardcoded value id = 3 == Coding Books
                 int id = 3;
-                HttpResponseMessage response = await client.GetAsync("/api/Shelves/" + id);
+                HttpResponseMessage response = await client.GetAsync("/group-project-proxy/api/Shelves/" + id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -580,7 +581,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
 
                 Console.WriteLine(shelf.Name);
                 string postBody = JsonConvert.SerializeObject(shelf);
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/Shelves", shelf);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/group-project-proxy/api/Shelves", shelf);
             }
             catch (Exception e)
             {
@@ -593,7 +594,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             try
             {
                 // Hardcoded value id = 6 (May change since it is deleted from db)
-                HttpResponseMessage response = await client.DeleteAsync("/api/Shelves/" + 6);
+                HttpResponseMessage response = await client.DeleteAsync("/group-project-proxy/api/Shelves/" + 6);
                 Console.WriteLine($"status from DELETE {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
             }
@@ -615,7 +616,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                 };
 
                 // Hardcoded value id = 6 == Comic
-                HttpResponseMessage response = await client.PutAsJsonAsync("/api/Shelves/6", shelf);
+                HttpResponseMessage response = await client.PutAsJsonAsync("/group-project-proxy/api/Shelves/6", shelf);
                 Console.WriteLine($"status from PUT {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
             }
@@ -633,7 +634,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 string json;
                 HttpResponseMessage response;
-                response = await client.GetAsync("/api/BookShelves");
+                response = await client.GetAsync("/group-project-proxy/api/BookShelves");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -664,7 +665,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             {
                 // Hardcoded value id = 12 == ShelfId:3/BookId:50
                 int id = 12;
-                HttpResponseMessage response = await client.GetAsync("/api/BookShelves/" + id);
+                HttpResponseMessage response = await client.GetAsync("/group-project-proxy/api/BookShelves/" + id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -690,7 +691,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
                 };
 
                 string postBody = JsonConvert.SerializeObject(bookshelf);
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/BookShelves", bookshelf);
+                HttpResponseMessage response = await client.PostAsJsonAsync("/group-project-proxy/api/BookShelves", bookshelf);
             }
             catch (Exception e)
             {
@@ -703,7 +704,7 @@ namespace _300954759_Kim__300825160_Perroni__Client
             try
             {
                 // Hardcoded value id = 12 (May change since it is deleted from db)
-                HttpResponseMessage response = await client.DeleteAsync("/api/BookShelves/" + 13);
+                HttpResponseMessage response = await client.DeleteAsync("/group-project-proxy/api/BookShelves/" + 13);
                 Console.WriteLine($"status from DELETE {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
             }
